@@ -18,7 +18,7 @@ import kotlin.also
 class SimpleLRUCache<Key, Value>(private var cacheSize: Int) {
 
     init {
-        //make sure no one is evil enough to try and set no valid cache size.
+        //make sure no one is evil enough to try and set an invalid cache size.
         cacheSize = getLeastValidCacheSize(cacheSize)
     }
 
@@ -36,8 +36,8 @@ class SimpleLRUCache<Key, Value>(private var cacheSize: Int) {
      */
     fun put(key: Key, value: Value): Key? {
         val evictedKey: Key? = shouldEvict().mapLazy(
-                ifTrue = { evict() },
-                ifFalse = { null })
+            ifTrue = { evict() },
+            ifFalse = { null })
 
         map[key] = value
         order.add(key)
@@ -50,7 +50,12 @@ class SimpleLRUCache<Key, Value>(private var cacheSize: Int) {
      * @return Boolean
      * @TimeComplexity O(1)
      */
-    fun containsKey(key: Key) = map.containsKey(key)
+    fun containsKey(key: Key?): Boolean {
+        if (key == null) {
+            return false
+        }
+        return map.containsKey(key)
+    }
 
     /**
      *
@@ -58,7 +63,7 @@ class SimpleLRUCache<Key, Value>(private var cacheSize: Int) {
      * @return Boolean
      * @TimeComplexity O(1)
      */
-    fun notContainsKey(key: Key) = !containsKey(key)
+    fun notContainsKey(key: Key?) = !containsKey(key)
 
     /**
      *
@@ -81,7 +86,12 @@ class SimpleLRUCache<Key, Value>(private var cacheSize: Int) {
      * @return Value?
      * @TimeComplexity O(1)
      */
-    operator fun get(key: Key): Value? = map[key]
+    operator fun get(key: Key?): Value? {
+        if (key == null) {
+            return null
+        }
+        return map[key]
+    }
 
     /**
      * Gets a given value , and if there and the given condition is met the value is returned,
